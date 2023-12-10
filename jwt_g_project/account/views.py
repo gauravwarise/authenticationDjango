@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from core.models import *
 from rest_framework.response import Response
 from django.http import JsonResponse
+from core.serializers import AuthUserSerializer
 
 
 # Create your views here.
@@ -33,11 +34,30 @@ class AuthView(APIView):
         action = request.data.get('action')
         if action == 'register':
             return self.user_register(request)
+        elif action == 'login':
+            return self.user_login(request)
+        elif action == 'logout':
+            return self.user_logout(request)
         else:
             return JsonResponse({'error': 'Invalid action'}, status=400)
+        
 
 
     def user_register(self, request):
-        print("user registration done!!!!")
-        return Response({'message': 'User registration successful'})
+        print(request.data)
+        serializer = AuthUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User registration successful'})
+        else:
+            return Response({'message': 'User registration failed'})
+
+    
+
+    def user_login(self, request):
+        return Response({'message': 'User login successful'})
+    
+    def user_logout(self, request):
+        return Response({'message': 'User logout successful'})
+    
 
